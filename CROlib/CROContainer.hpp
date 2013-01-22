@@ -50,7 +50,7 @@ public:
             update(m);
         }
         eBuffer = param->iniBuffer;
-    };
+    }
 
     virtual ~CRO()
     {
@@ -59,7 +59,7 @@ public:
         for (unsigned int i = 0; i < pop.size(); i++)
             delete pop[i];
         pop.clear();
-    };
+    }
 
     double run()
     {
@@ -122,7 +122,7 @@ public:
             }
         }
         return optGlobal;
-    };
+    }
 
 private:
     void update(const mol* m)
@@ -132,14 +132,14 @@ private:
             optGlobal = m->PE;
             optMol->clone(m);
         }
-    };
+    }
 
     void initMolValue(mol* m)
     {
         m->KE = param->iniKE;
         m->PE = oprFit(m);
         m->optLocal = m->PE;
-    };
+    }
 
     void wall(mol* m)
     {
@@ -156,7 +156,7 @@ private:
             m->update();
             eBuffer += excessEnergy - m->KE;
         }
-    };
+    }
 
     bool dec(mol* m1, mol* m2)
     {
@@ -191,7 +191,7 @@ private:
             return true;
         }
         return false;
-    };
+    }
 
     void inter(mol* m1, mol* m2)
     {
@@ -213,7 +213,7 @@ private:
             m2->clone(t2);
             m2->update();
         }
-    };
+    }
 
     bool syn(mol* m1, mol* m2)
     {
@@ -232,5 +232,5 @@ private:
             return true;
         }
         return false;
-    };
+    }
 };

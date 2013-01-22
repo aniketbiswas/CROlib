@@ -11,9 +11,9 @@ public:
     {
         minHitIndex = 0;
         curHitIndex = 0;
-    };
+    }
 
-    virtual ~CROMolecule() {};
+    virtual ~CROMolecule() {}
 
     void update()
     {
@@ -22,12 +22,12 @@ public:
             optLocal = PE;
             minHitIndex = curHitIndex;
         }
-    };
+    }
 
     bool isInactive(int threshold)
     {
         return (curHitIndex - minHitIndex) > threshold;
-    };
+    }
 
-    void clone(const CROMolecule* source) {};
+    void clone(const CROMolecule* source) {}
 };
