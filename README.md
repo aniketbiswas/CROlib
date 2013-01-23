@@ -2,13 +2,19 @@
 
 CROlib is a C++ library of Chemical Reaction Optimization (CRO). It contains a set of C++ CRO objects. The library includes tools for using CRO to do optimization in any C++ program using any representation and operators.
 
-## Installation
+## Documentation
 
-Copy the CROlib folder to your source folder or to somewhere trackable by your compiler, and ... done.
+Complete documentation is pubilshed in CROlib's [Wiki Page](https://github.com/yujianqiao/CROlib/wiki).
 
-## Usage
+## System Requirements
 
-We provide several examples under ./example folder. You can follow these examples to buid your own problem.
+CROlib has been built with various compilers on different OS including
+
+* MinGW gcc-4.6.2-1
+* MSVC 11
+* Linux gcc-4.7.2
+* LLVM gcc-4.2
+* LLVM compiler 2.0
 
 ## License
 
