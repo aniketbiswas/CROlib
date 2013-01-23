@@ -12,4 +12,4 @@ We provide several examples under ./example folder. You can follow these example
 
 ## License
 
-CROlib is released under [MIT](http://www.opensource.org/licenses/mit-license.php) and [GPL](http://www.gnu.org/licenses/gpl.html) license.
+CROlib is released under [GPL](http://www.gnu.org/licenses/gpl.html) license.
