@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "CROMolecule.hpp"
+#include "CROOperator.hpp"
 #include "CROParameter.hpp"
 #include "CROUtility.hpp"
 
@@ -8,12 +9,7 @@ template<class mol>
 class CRO
 {
 public:
-    double (*oprFit)(const mol*);
-    mol* (*oprInit)();
-    void (*oprWall)(const mol*, mol*);
-    void (*oprDec)(const mol*, mol*, mol*);
-    void (*oprInter)(const mol*, const mol*, mol*, mol*);
-    void (*oprSyn)(const mol*, const mol*, mol*);
+    CROOperator<mol>* opr;
     CROParameter* param;
     mol* t1,* t2,* optMol;
     int curFE;
@@ -21,22 +17,16 @@ public:
     std::vector<mol*> pop;
 
 public:
-    CRO(double (*fit)(const mol*),
-        mol* (*init)(),
-        void (*wall)(const mol*, mol*),
-        void (*dec)(const mol*, mol*, mol*),
-        void (*inter)(const mol*, const mol*, mol*, mol*),
-        void (*syn)(const mol*, const mol*, mol*),
+    CRO(CROOperator<mol>* usrOpr,
         CROParameter* usrParam = NULL) :
-        oprFit(fit), oprInit(init), oprWall(wall), oprDec(dec),
-        oprInter(inter), oprSyn(syn), param(usrParam), optGlobal(1E300)
+        opr(usrOpr), param(usrParam), optGlobal(1E300)
     {
         if (param == NULL)
             param = new CROParameter();
 
-        t1 = oprInit();
-        t2 = oprInit();
-        optMol = oprInit();
+        t1 = opr->oprInit();
+        t2 = opr->oprInit();
+        optMol = opr->oprInit();
         initMolValue(t1);
         initMolValue(t2);
         initMolValue(optMol);
@@ -44,7 +34,7 @@ public:
         curFE = param->iniPopSize;
         for (int i = 0; i < param->iniPopSize; i++)
         {
-            mol* m = oprInit();
+            mol* m = opr->oprInit();
             initMolValue(m);
             pop.push_back(m);
             update(m);
@@ -71,7 +61,7 @@ public:
                 // Decomposition
                 if (pop[pos]->isInactive(param->decThres))
                 {
-                    mol* m = oprInit();
+                    mol* m = opr->oprInit();
                     initMolValue(m);
                     if (dec(pop[pos], m))
                     {
@@ -137,15 +127,15 @@ private:
     void initMolValue(mol* m)
     {
         m->KE = param->iniKE;
-        m->PE = oprFit(m);
+        m->PE = opr->oprFit(m);
         m->optLocal = m->PE;
     }
 
     void wall(mol* m)
     {
         m->curHitIndex++;
-        oprWall(m, t1);
-        double tempPE = oprFit(t1);
+        opr->oprWall(m, t1);
+        double tempPE = opr->oprFit(t1);
         double excessEnergy = m->PE + m->KE - tempPE;
         if (excessEnergy >= 0)
         {
@@ -161,9 +151,9 @@ private:
     bool dec(mol* m1, mol* m2)
     {
         m1->curHitIndex++;
-        oprDec(m1, t1, t2);
-        double tempPE1 = oprFit(t1);
-        double tempPE2 = oprFit(t2);
+        opr->oprDec(m1, t1, t2);
+        double tempPE1 = opr->oprFit(t1);
+        double tempPE2 = opr->oprFit(t2);
         double excessEnergy = m1->PE + m1->KE - tempPE1 - tempPE2;
         if ((excessEnergy >= 0) || (excessEnergy + eBuffer >= 0))
         {
@@ -197,9 +187,9 @@ private:
     {
         m1->curHitIndex++;
         m2->curHitIndex++;
-        oprInter(m1, m2, t1, t2);
-        double tempPE1 = oprFit(t1);
-        double tempPE2 = oprFit(t2);
+        opr->oprInter(m1, m2, t1, t2);
+        double tempPE1 = opr->oprFit(t1);
+        double tempPE2 = opr->oprFit(t2);
         double excessEnergy = m1->PE + m1->KE + m2->PE + m2->KE -
                               tempPE1 - tempPE2;
         if (excessEnergy >= 0)
@@ -218,8 +208,8 @@ private:
     bool syn(mol* m1, mol* m2)
     {
         m1->curHitIndex++;
-        oprSyn(m1, m2, t1);
-        double tempPE = oprFit(t1);
+        opr->oprSyn(m1, m2, t1);
+        double tempPE = opr->oprFit(t1);
         double excessEnergy = m1->PE + m1->KE + m2->PE + m2->KE - tempPE;
         if (excessEnergy >= 0)
         {

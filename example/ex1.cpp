@@ -108,11 +108,12 @@ int main()
     srand(time(NULL));
     /* Create a CRO object. In the construction period, the initial environment
      * of the container, including initial population, energy buffer, etc., is
-     * created. The six input attributes are the pointers to functions of the
-     * six operators.
+     * created. The input attribute is a CROOperator object which stores the
+     * pointers to all operators.
      */
-    CRO<myMol>* c1 = new CRO<myMol>(molFit, molInit, molWall, molDec, molInter,
-                                    molSyn);
+    CROOperator<myMol>* opr = new CROOperator<myMol>(molFit, molInit, molWall,
+                                                     molDec, molInter, molSyn);
+    CRO<myMol>* c1 = new CRO<myMol>(opr);
     /* The above initialization has no parameter as input, so CROlib will
      * initialize one for you. However, you can change the default parameter
      * after you have create the CRO object as follows.
@@ -124,8 +125,7 @@ int main()
     CROParameter* param = new CROParameter();
     param->FELimit = 1E6;
     param->iniKE = 100;
-    CRO<myMol>* c2 = new CRO<myMol>(molFit, molInit, molWall, molDec, molInter,
-                                    molSyn, param);
+    CRO<myMol>* c2 = new CRO<myMol>(opr, param);
     /* Certainly it is fine if you want to add some parameter to the original
      * CRO parameters by creating a new class inherited from CROParameter class.
      * Again, do not worry about the memory employed by the above CROParameter
