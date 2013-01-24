@@ -1,20 +1,20 @@
 /* This file is a part of CROlib
  * Copyright (C) 2013 James J. Q. Yu
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 #include <iostream>
 #include <math.h>
 #include <string.h>
@@ -22,6 +22,13 @@
 #include "../CROlib/CRO.hpp"
 
 using namespace std;
+
+double molFit(const CROMolecule* m);
+void molWall(const CROMolecule* m, CROMolecule* t);
+void molDec(const CROMolecule* m1, CROMolecule* t1, CROMolecule* t2);
+void molInter(const CROMolecule* m1, const CROMolecule* m2, CROMolecule* t1,
+              CROMolecule* t2);
+void molSyn(const CROMolecule* m1, const CROMolecule* m2, CROMolecule* t1);
 
 /* Before your start using CRO, you shall create your own molecule class
  * inherited from the build-in CROMolecule class. In your own class, the
@@ -36,6 +43,19 @@ public:
     int N;
 
 public:
+    myMol()
+    {
+        oprFit = molFit;
+        oprWall = molWall;
+        oprDec = molDec;
+        oprInter = molInter;
+        oprSyn = molSyn;
+        N = 2;
+        x = new double[N];
+        for (int i=0; i < 2; i++)
+            x[i] = randDouble(); // Generates random numbers in [0,1)
+        }
+
     virtual ~myMol()
     {
         delete[] x;
@@ -55,8 +75,9 @@ public:
  * implement the fitness function. The function head of this function is defined
  * as the following function. The function name can be changed as you wish.
  */
-double molFit(const myMol* m)
+double molFit(const CROMolecule* mol)
 {
+    myMol* m = (myMol*)mol;
     return sin(m->x[0]) + cos(m->x[1]);
 }
 
@@ -64,25 +85,11 @@ double molFit(const myMol* m)
  * The function names can be changed as you wish.
  */
 
-/* The molecule initialization function is called whenever a new molecule is to
- * be generated. This function shall return a pointer point to the memory stores
- * a molecule object. So you shall "new" the object by your own. Meanwhile you
- * do not have to worry about the memory management: CROlib will release the
- * memory when appropriate.
- */
-myMol* molInit()
-{
-    myMol* m = new myMol();
-    m->N = 2;
-    m->x = new double[m->N];
-    for (int i=0; i < 2; i++)
-        m->x[i] = randDouble(); // Generates random numbers in [0,1)
-    return m;
-}
-
 // On-wall collision operator.
-void molWall(const myMol* m, myMol* t)
+void molWall(const CROMolecule* in, CROMolecule* out)
 {
+    myMol* m = (myMol*)in;
+    myMol* t = (myMol*)out;
     t->clone(m);
     if (randDouble()>0.5)
         t->x[1] = t->x[1]+randDouble();
@@ -91,8 +98,11 @@ void molWall(const myMol* m, myMol* t)
 }
 
 // Decomposition operator.
-void molDec(const myMol* m1, myMol* t1, myMol* t2)
+void molDec(const CROMolecule* in1, CROMolecule* out1, CROMolecule* out2)
 {
+    myMol* m1 = (myMol*)in1;
+    myMol* t1 = (myMol*)out1;
+    myMol* t2 = (myMol*)out2;
     t1->clone(m1);
     t2->clone(m1);
     t1->x[0] = t1->x[0]+randDouble();
@@ -100,8 +110,13 @@ void molDec(const myMol* m1, myMol* t1, myMol* t2)
 }
 
 // Inter-molecular operator.
-void molInter(const myMol* m1, const myMol* m2, myMol* t1, myMol* t2)
+void molInter(const CROMolecule* in1, const CROMolecule* in2, CROMolecule* out1,
+              CROMolecule* out2)
 {
+    myMol* m1 = (myMol*)in1;
+    myMol* m2 = (myMol*)in2;
+    myMol* t1 = (myMol*)out1;
+    myMol* t2 = (myMol*)out2;
     t1->x[0] = m2->x[0];
     t1->x[1] = m1->x[1];
     t2->x[0] = m1->x[0];
@@ -109,8 +124,11 @@ void molInter(const myMol* m1, const myMol* m2, myMol* t1, myMol* t2)
 }
 
 // Synthesis operator.
-void molSyn(const myMol* m1, const myMol* m2, myMol* t1)
+void molSyn(const CROMolecule* in1, const CROMolecule* in2, CROMolecule* out1)
 {
+    myMol* m1 = (myMol*)in1;
+    myMol* m2 = (myMol*)in2;
+    myMol* t1 = (myMol*)out1;
     t1->clone(m1);
     if (randDouble()>0.5)
         t1->x[1] = m2->x[1];
@@ -125,12 +143,9 @@ int main()
     srand(time(NULL));
     /* Create a CRO object. In the construction period, the initial environment
      * of the container, including initial population, energy buffer, etc., is
-     * created. The input attribute is a CROOperator object which stores the
-     * pointers to all operators.
+     * created.
      */
-    CROOperator<myMol>* opr = new CROOperator<myMol>(molFit, molInit, molWall,
-                                                     molDec, molInter, molSyn);
-    CRO<myMol>* c1 = new CRO<myMol>(opr);
+    CRO<myMol>* c1 = new CRO<myMol>();
     /* The above initialization has no parameter as input, so CROlib will
      * initialize one for you. However, you can change the default parameter
      * after you have create the CRO object as follows.
@@ -142,7 +157,7 @@ int main()
     CROParameter* param = new CROParameter();
     param->FELimit = 1E6;
     param->iniKE = 100;
-    CRO<myMol>* c2 = new CRO<myMol>(opr, param);
+    CRO<myMol>* c2 = new CRO<myMol>(param);
     /* Certainly it is fine if you want to add some parameter to the original
      * CRO parameters by creating a new class inherited from CROParameter class.
      * Again, do not worry about the memory employed by the above CROParameter
