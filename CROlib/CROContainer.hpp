@@ -69,9 +69,9 @@ public:
     {
         while(curFE < param->FELimit)
         {
-            if ((randDouble() > param->collRate)||(pop.size() == 1))
+            if ((CRORandDouble() > param->collRate)||(pop.size() == 1))
             {
-                int pos = randInt(pop.size());
+                int pos = CRORandInt(pop.size());
                 // Decomposition
                 if (pop[pos]->isInactive(param->decThres))
                 {
@@ -99,10 +99,10 @@ public:
             }
             else
             {
-                int pos1 = randInt(pop.size());
+                int pos1 = CRORandInt(pop.size());
                 int pos2 = pos1;
                 while (pos1 == pos2)
-                    pos2 = randInt(pop.size());
+                    pos2 = CRORandInt(pop.size());
                 // Synthesis
                 if ((pop[pos1]->KE < param->synThres)&&
                         (pop[pos2]->KE < param->synThres))
@@ -148,7 +148,7 @@ private:
         {
             m->PE = tempPE;
             m->KE = excessEnergy * ((1.0 - param->lossRate) *
-                                    randDouble() + param->lossRate);
+                                    CRORandDouble() + param->lossRate);
             m->clone(t1);
             m->update();
             eBuffer += excessEnergy - m->KE;
@@ -166,15 +166,15 @@ private:
         {
             if (excessEnergy >= 0)
             {
-                m1->KE = excessEnergy * randDouble();
+                m1->KE = excessEnergy * CRORandDouble();
                 m2->KE = excessEnergy - m1->KE;
             }
             else
             {
                 eBuffer += excessEnergy;
-                m1->KE = eBuffer * randDouble() * randDouble();
+                m1->KE = eBuffer * CRORandDouble() * CRORandDouble();
                 eBuffer -= m1->KE;
-                m2->KE = eBuffer * randDouble() * randDouble();
+                m2->KE = eBuffer * CRORandDouble() * CRORandDouble();
                 eBuffer -= m2->KE;
             }
             m1->minHitIndex = 0;
@@ -202,7 +202,7 @@ private:
         if (excessEnergy >= 0)
         {
             m1->PE = tempPE1;
-            m1->KE = excessEnergy * randDouble();
+            m1->KE = excessEnergy * CRORandDouble();
             m1->clone(t1);
             m1->update();
             m2->PE = tempPE2;

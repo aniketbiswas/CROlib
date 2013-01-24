@@ -53,7 +53,7 @@ public:
         N = 2;
         x = new double[N];
         for (int i=0; i < 2; i++)
-            x[i] = randDouble(); // Generates random numbers in [0,1)
+            x[i] = CRORandDouble(); // Generates random numbers in [0,1)
         }
 
     virtual ~myMol()
@@ -91,10 +91,10 @@ void molWall(const CROMolecule* in, CROMolecule* out)
     myMol* m = (myMol*)in;
     myMol* t = (myMol*)out;
     t->clone(m);
-    if (randDouble()>0.5)
-        t->x[1] = t->x[1]+randDouble();
+    if (CRORandDouble()>0.5)
+        t->x[1] = t->x[1]+CRORandDouble();
     else
-        t->x[0] = t->x[0]+randDouble();
+        t->x[0] = t->x[0]+CRORandDouble();
 }
 
 // Decomposition operator.
@@ -105,8 +105,8 @@ void molDec(const CROMolecule* in1, CROMolecule* out1, CROMolecule* out2)
     myMol* t2 = (myMol*)out2;
     t1->clone(m1);
     t2->clone(m1);
-    t1->x[0] = t1->x[0]+randDouble();
-    t2->x[1] = t2->x[1]+randDouble();
+    t1->x[0] = t1->x[0]+CRORandDouble();
+    t2->x[1] = t2->x[1]+CRORandDouble();
 }
 
 // Inter-molecular operator.
@@ -130,7 +130,7 @@ void molSyn(const CROMolecule* in1, const CROMolecule* in2, CROMolecule* out1)
     myMol* m2 = (myMol*)in2;
     myMol* t1 = (myMol*)out1;
     t1->clone(m1);
-    if (randDouble()>0.5)
+    if (CRORandDouble()>0.5)
         t1->x[1] = m2->x[1];
     else
         t1->x[0] = m2->x[0];
