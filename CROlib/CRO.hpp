@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "CROContainer.hpp"
+#include "CROAlgorithm.hpp"
 #include "CROMolecule.hpp"
 #include "CROParameter.hpp"
 #include "CRORandom.hpp"
