@@ -44,7 +44,6 @@ public:
 public:
     myMol()
     {
-        oprFit = molFit;
         oprWall = molWall;
         oprDec = molDec;
         oprInter = molInter;
@@ -64,8 +63,9 @@ public:
      * class. The purpose is to tell CROlib how to copy the solution in one
      * molecule to another.
      */
-    void clone(const myMol* source)
+    virtual void clone(const myMol* source)
     {
+        CROMolecule::clone(source);
         memcpy(x, source->x, sizeof(double) * N);
     }
 };
@@ -144,7 +144,7 @@ int main()
      * of the container, including initial population, energy buffer, etc., is
      * created.
      */
-    CRO<myMol>* c1 = new CRO<myMol>();
+    CRO<myMol>* c1 = new CRO<myMol>(molFit);
     /* The above initialization has no parameter as input, so CROlib will
      * initialize one for you. However, you can change the default parameter
      * after you have create the CRO object as follows.
@@ -156,7 +156,7 @@ int main()
     CROParameter* param = new CROParameter();
     param->FELimit = 1E6;
     param->iniKE = 100;
-    CRO<myMol>* c2 = new CRO<myMol>(param);
+    CRO<myMol>* c2 = new CRO<myMol>(molFit, param);
     /* Certainly it is fine if you want to add some parameter to the original
      * CRO parameters by creating a new class inherited from CROParameter class.
      * Again, do not worry about the memory employed by the above CROParameter

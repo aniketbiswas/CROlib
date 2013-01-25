@@ -25,31 +25,37 @@ template<class mol>
 class CRO
 {
 public:
+    double (*oprFit)(const CROMolecule*);
     CROParameter* param;
-    mol* t1,* t2,* optMol;
-    int curFE;
-    double optGlobal, eBuffer;
+    mol* optMol;
+    double optGlobal;
     std::vector<mol*> pop;
 
+private:
+	mol* t1,* t2;
+    int curFE;
+	double eBuffer;
+
 public:
-    CRO(CROParameter* usrParam = NULL) :
-        param(usrParam), optGlobal(1E300)
+    CRO(double (*usrFit)(const CROMolecule*),
+        CROParameter* usrParam = NULL) :
+        oprFit(usrFit), param(usrParam), optGlobal(1E300)
     {
         if (param == NULL)
             param = new CROParameter();
 
         t1 = new mol();
-        t1->init(param->iniKE);
+        initMol(t1);
         t2 = new mol();
-        t2->init(param->iniKE);
+        initMol(t2);
         optMol = new mol();
-        optMol->init(param->iniKE);
+        initMol(optMol);
 
         curFE = param->iniPopSize;
         for (int i = 0; i < param->iniPopSize; i++)
         {
             mol* m = new mol();
-            m->init(param->iniKE);
+            initMol(m);
             pop.push_back(m);
             update(m);
         }
@@ -76,7 +82,7 @@ public:
                 if (pop[pos]->isInactive(param->decThres))
                 {
                     mol* m = new mol();
-                    m->init(param->iniKE);
+                    initMol(m);
                     if (dec(pop[pos], m))
                     {
                         pop.push_back(m);
@@ -129,6 +135,15 @@ public:
     }
 
 private:
+    void initMol(mol* m)
+    {
+        m->minHitIndex = 0;
+        m->curHitIndex = 0;
+        m->KE = param->iniKE;
+        m->PE = oprFit(m);
+        m->optLocal = m->PE;
+    }
+
     void update(const mol* m)
     {
         if (m->PE < optGlobal)
@@ -142,7 +157,7 @@ private:
     {
         m->curHitIndex++;
         m->oprWall(m, t1);
-        double tempPE = m->oprFit(t1);
+        double tempPE = oprFit(t1);
         double excessEnergy = m->PE + m->KE - tempPE;
         if (excessEnergy >= 0)
         {
@@ -159,8 +174,8 @@ private:
     {
         m1->curHitIndex++;
         m1->oprDec(m1, t1, t2);
-        double tempPE1 = m1->oprFit(t1);
-        double tempPE2 = m2->oprFit(t2);
+        double tempPE1 = oprFit(t1);
+        double tempPE2 = oprFit(t2);
         double excessEnergy = m1->PE + m1->KE - tempPE1 - tempPE2;
         if ((excessEnergy >= 0) || (excessEnergy + eBuffer >= 0))
         {
@@ -195,8 +210,8 @@ private:
         m1->curHitIndex++;
         m2->curHitIndex++;
         m1->oprInter(m1, m2, t1, t2);
-        double tempPE1 = m1->oprFit(t1);
-        double tempPE2 = m2->oprFit(t2);
+        double tempPE1 = oprFit(t1);
+        double tempPE2 = oprFit(t2);
         double excessEnergy = m1->PE + m1->KE + m2->PE + m2->KE -
                               tempPE1 - tempPE2;
         if (excessEnergy >= 0)
@@ -216,7 +231,7 @@ private:
     {
         m1->curHitIndex++;
         m1->oprSyn(m1, m2, t1);
-        double tempPE = m1->oprFit(t1);
+        double tempPE = oprFit(t1);
         double excessEnergy = m1->PE + m1->KE + m2->PE + m2->KE - tempPE;
         if (excessEnergy >= 0)
         {

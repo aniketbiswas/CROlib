@@ -23,7 +23,6 @@ public:
     double PE, KE, optLocal;
     int minHitIndex, curHitIndex;
 
-    double (*oprFit)(const CROMolecule*);
     void (*oprWall)(const CROMolecule*, CROMolecule*);
     void (*oprDec)(const CROMolecule*, CROMolecule*, CROMolecule*);
     void (*oprInter)(const CROMolecule*, const CROMolecule*, CROMolecule*, CROMolecule*);
@@ -33,15 +32,6 @@ public:
     CROMolecule() {}
 
     virtual ~CROMolecule() {}
-
-    void init(int iniKE)
-    {
-        minHitIndex = 0;
-        curHitIndex = 0;
-        KE = iniKE;
-        PE = oprFit(this);
-        optLocal = PE;
-    }
 
     void update()
     {
@@ -57,5 +47,5 @@ public:
         return (curHitIndex - minHitIndex) > threshold;
     }
 
-    void clone(const CROMolecule* source) {}
+    virtual void clone(const CROMolecule* source) {}
 };
