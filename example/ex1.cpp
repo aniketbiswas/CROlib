@@ -153,9 +153,7 @@ int main()
     c1->param->iniKE = 100;
     /* You can also initialize one as input as follows.
      */
-    CROParameter* param = new CROParameter();
-    param->FELimit = 1E6;
-    param->iniKE = 100;
+    CROParameter* param = new CROParameter("example/ex1conf.txt");
     CRO<myMol>* c2 = new CRO<myMol>(molFit, param);
     /* Certainly it is fine if you want to add some parameter to the original
      * CRO parameters by creating a new class inherited from CROParameter class.
