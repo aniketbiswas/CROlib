@@ -18,7 +18,6 @@
 #include <iostream>
 #include <math.h>
 #include <string.h>
-#include <time.h>
 #include "../CROlib/CRO.hpp"
 
 using namespace std;

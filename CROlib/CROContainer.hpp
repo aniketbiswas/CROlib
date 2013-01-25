@@ -19,7 +19,7 @@
 #include <vector>
 #include "CROMolecule.hpp"
 #include "CROParameter.hpp"
-#include "CROUtility.hpp"
+#include "CRORandom.hpp"
 
 template<class mol>
 class CRO

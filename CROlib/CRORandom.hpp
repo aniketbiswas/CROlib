@@ -17,6 +17,15 @@
 
 #pragma once
 #include <stdlib.h>
+#include <time.h>
+
+void CRORandSeed(unsigned seed = 0)
+{
+    if (seed == 0)
+        srand(time(NULL));
+    else
+        srand(seed);
+}
 
 double CRORandDouble()
 {
